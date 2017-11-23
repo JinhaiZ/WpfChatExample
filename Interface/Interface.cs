@@ -9,5 +9,9 @@ namespace RemotingInterface
     public interface IRemotChaine
     {
         string Hello();
+        void sendMsgToServer(string msg);
+        int clientLogin(string pseudo);
+        void clientLogout();
+        string getUpdateFromServer(int logicTime);
     }
 }
