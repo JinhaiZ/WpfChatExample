@@ -29,6 +29,8 @@ namespace Client
         private RemotingInterface.IRemotChaine LeRemot;
         private DispatcherTimer timer;
         private LinkedList<string> listMembers;
+        private int logicTime;
+        private string pseudo;
 
         public ObservableCollection<MemberViewItem> membersViewList = new ObservableCollection<MemberViewItem>();
         public MainWindow()
@@ -58,21 +60,25 @@ namespace Client
         // event handler for timer.Tick, been called every 1 second
         private void timer1_Tick(object sender, EventArgs e)
         {
-            //Debug.WriteLine("haha");
             
+            string response = LeRemot.getUpdateFromServer(logicTime);
+            Debug.WriteLine($"--tick--response {response}");
+            Debug.WriteLine(response);
+            if (response != "")
+            {
+                ChatHistory.Text += $"{response}\n";
+                logicTime++;
+            }
+            listMembers = LeRemot.getClientListFromServer();
+            Debug.WriteLine(listMembers.Count);
             //timer.Stop();
             //this.Close();
-        }
-
-        private void InputBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            OutputBox.Text = LeRemot.Hello();
         }
 
         private void Login_Click(object sender, RoutedEventArgs e)
         {
             int port = Int32.Parse(PortBox.Text);
-            string pseudo = PseudoBox.Text;
+            pseudo = PseudoBox.Text;
             string ip = IPBox.Text;
             PortBox.IsEnabled = false;
             PseudoBox.IsEnabled = false;
@@ -83,6 +89,7 @@ namespace Client
             if (LeRemot != null)
             {
                 // start a thread to get updates from server
+                logicTime = LeRemot.clientLogin(pseudo);
                 Client_Logined();
             }
             //TODO: manage error input
@@ -97,5 +104,13 @@ namespace Client
             public string MemberName { get; set; }
         }
 
+        private void Send_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine($"{pseudo}: {InputBox.Text}");
+            if (InputBox.Text.Trim() != "")
+            {
+                LeRemot.sendMsgToServer($"{pseudo}: {InputBox.Text}");
+            }
+        }
     }
 }

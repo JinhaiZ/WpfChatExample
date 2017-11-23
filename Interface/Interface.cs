@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace RemotingInterface
 {
@@ -11,7 +12,8 @@ namespace RemotingInterface
         string Hello();
         void sendMsgToServer(string msg);
         int clientLogin(string pseudo);
-        void clientLogout();
+        void clientLogout(string pseudo);
         string getUpdateFromServer(int logicTime);
+        LinkedList<string> getClientListFromServer();
     }
 }

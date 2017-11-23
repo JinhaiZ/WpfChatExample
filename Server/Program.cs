@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
@@ -11,8 +12,8 @@ namespace remotServeur
     /// </summary>
     public class Serveur : MarshalByRefObject, RemotingInterface.IRemotChaine
     {
-        private int logicTime = 0;
         private LinkedList<string> listMembers = new LinkedList<string>();
+        private List<string> historyMessage = new List<string>();
         static void Main()
         {
             // Création d'un nouveau canal pour le transfert des données via un port 
@@ -49,22 +50,37 @@ namespace remotServeur
 
         public void sendMsgToServer(string msg)
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"{msg}");
+            historyMessage.Add(msg);
         }
 
         public int clientLogin(string pseudo)
         {
-            throw new NotImplementedException();
+            if (listMembers.Contains(pseudo))
+                return -1;
+            listMembers.AddLast(pseudo);
+            sendMsgToServer($"{pseudo} has joined the chat");
+            return historyMessage.Count;
         }
 
-        public void clientLogout()
+        public void clientLogout(string pseudo)
         {
-            throw new NotImplementedException();
+            listMembers.Remove(pseudo);
+            sendMsgToServer($"{pseudo} has left the chat");
         }
 
         public string getUpdateFromServer(int logicTime)
         {
-            throw new NotImplementedException();
+            if (logicTime < historyMessage.Count)
+            {
+                return historyMessage[logicTime];
+            }
+            return "";
+        }
+
+        public LinkedList<string> getClientListFromServer()
+        {
+            return listMembers;
         }
 
         #endregion

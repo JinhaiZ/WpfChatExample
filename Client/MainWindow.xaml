@@ -9,14 +9,14 @@
     <Grid>
         <Button x:Name="Login" Content="Login" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="9,5,0,0" Click="Login_Click"/>
         <Button x:Name="Logout" Content="Logout" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="99,5,0,0"/>
-        <TextBox x:Name="OutputBox" HorizontalAlignment="Left" Height="148" TextWrapping="Wrap" VerticalAlignment="Top" Width="251" Margin="10,46,0,0"/>
-        <TextBox x:Name="InputBox" HorizontalAlignment="Left" Height="72" TextWrapping="Wrap" VerticalAlignment="Top" Width="252" Margin="9,228,0,0" TextChanged="InputBox_TextChanged"/>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Please input a message" VerticalAlignment="Top" Margin="10,207,0,0"/>
+        <TextBox x:Name="ChatHistory" HorizontalAlignment="Left" Height="195" TextWrapping="Wrap" VerticalAlignment="Top" Width="251" Margin="10,46,0,0"/>
+        <TextBox x:Name="InputBox" HorizontalAlignment="Left" Height="20" TextWrapping="Wrap" VerticalAlignment="Top" Width="252" Margin="9,280,0,0"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Please input a message" VerticalAlignment="Top" Margin="10,252,0,0"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="278,46,0,0" Height="35"><Run Text="Number"/><LineBreak/><Run Text="Port:"/><LineBreak/><Run/></TextBlock>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="278,116,0,0" Height="19" Text="Pseudo:"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="278,175,0,0" Height="19" Text="IP:"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="425,12,0,0" Height="19" Text="Members" RenderTransformOrigin="0.548,-0.202"/>
-        <Button x:Name="Send" Content="Send" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="278,280,0,0"/>
+        <Button x:Name="Send" Content="Send" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="278,280,0,0" Click="Send_Click"/>
         <TextBox x:Name="IPBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="77" Margin="315,171,0,0" Text="localhost"/>
         <TextBox x:Name="PseudoBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="77" Margin="329,115,0,0"/>
         <TextBox x:Name="PortBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="77" Margin="329,53,0,0" Text="12345"/>
