@@ -1,0 +1,26 @@
+﻿<Window x:Class="Client.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
+        <Button x:Name="Login" Content="Login" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="9,5,0,0"/>
+        <Button x:Name="Logout" Content="Logout" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="99,5,0,0"/>
+        <TextBox x:Name="OutputBox" HorizontalAlignment="Left" Height="148" TextWrapping="Wrap" VerticalAlignment="Top" Width="251" Margin="10,46,0,0"/>
+        <TextBox x:Name="InputBox" HorizontalAlignment="Left" Height="72" TextWrapping="Wrap" VerticalAlignment="Top" Width="252" Margin="9,228,0,0" TextChanged="InputBox_TextChanged"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Please input a message" VerticalAlignment="Top" Margin="10,207,0,0"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="278,46,0,0" Height="35"><Run Text="Number"/><LineBreak/><Run Text="Port:"/><LineBreak/><Run/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="278,116,0,0" Height="19" Text="Psudo:"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="278,175,0,0" Height="19" Text="IP:"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="425,12,0,0" Height="19" Text="Members" RenderTransformOrigin="0.548,-0.202"/>
+        <TextBox x:Name="MembersBox" HorizontalAlignment="Left" Height="254" TextWrapping="Wrap" VerticalAlignment="Top" Width="73" Margin="425,46,0,0"/>
+        <Button x:Name="Send" Content="Send" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="278,280,0,0"/>
+        <TextBox x:Name="IPBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="77" Margin="315,171,0,0"/>
+        <TextBox x:Name="PsudoBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="77" Margin="329,115,0,0"/>
+        <TextBox x:Name="PortBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="77" Margin="329,53,0,0"/>
+
+    </Grid>
+</Window>
