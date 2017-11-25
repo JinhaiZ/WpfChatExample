@@ -8,7 +8,7 @@
         Title="MainWindow" Height="350" Width="525">
     <Grid>
         <Button x:Name="Login" Content="Login" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="9,5,0,0" Click="Login_Click"/>
-        <Button x:Name="Logout" Content="Logout" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="99,5,0,0"/>
+        <Button x:Name="Logout" Content="Logout" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="99,5,0,0" Click="Logout_Click"/>
         <TextBox x:Name="ChatHistory" HorizontalAlignment="Left" Height="195" TextWrapping="Wrap" VerticalAlignment="Top" Width="251" Margin="10,46,0,0"/>
         <TextBox x:Name="InputBox" HorizontalAlignment="Left" Height="20" TextWrapping="Wrap" VerticalAlignment="Top" Width="252" Margin="9,280,0,0"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Please input a message" VerticalAlignment="Top" Margin="10,252,0,0"/>

@@ -54,11 +54,13 @@ namespace Client
         {
             Thread th = new Thread(new ThreadStart(synchronizeFromServer));
             th.Start();
+
+            listMembers = LeRemot.getClientListFromServer();
+            convertToListView(listMembers);
             // change UI component status
             Send.IsEnabled = true;
             Logout.IsEnabled = true;
-            listMembers = LeRemot.getClientListFromServer();
-            convertToListView(listMembers);
+            Login.IsEnabled = false;
         }
         // event handler for timer.Tick, been called every 1 second
         private void synchronizeFromServer()
@@ -73,28 +75,49 @@ namespace Client
                     {
                         ChatHistory.Text += $"{response}\n";
                         logicTime++;
-                        string pattern = @"\A([\w]+)\ has\ joined\ the\ chat\Z";
-                        MatchCollection matches = Regex.Matches(response, pattern);
-                        Debug.WriteLine("$matches count {matches.Count}\n");
-                        if (matches.Count > 0)
-                        {
-                            foreach (Match match in Regex.Matches(response, pattern))
-                            {
-                                Debug.WriteLine($"add {match.Groups[1].ToString()} to listMembers\n");
-                                listMembers.AddLast(match.Groups[1].ToString());
-                                
-                            }
-                            convertToListView(listMembers);
-                        }
-                        Debug.WriteLine($"listMembers count {listMembers.Count.ToString()}");
-                        foreach (string name in listMembers)
-                            Debug.WriteLine($"listMembers {name}");
+                        checkLoginMessage(response);
+                        checkLogoutMessage(response);
                     });
                 }
                 //Debug.WriteLine(listMembers);
             }
         }
-
+        public void checkLoginMessage(string response)
+        {
+            string pattern = @"\A([\w]+)\ has\ joined\ the\ chat\Z";
+            MatchCollection matches = Regex.Matches(response, pattern);
+            Debug.WriteLine("$matches count {matches.Count}\n");
+            if (matches.Count > 0)
+            {
+                foreach (Match match in Regex.Matches(response, pattern))
+                {
+                    //Debug.WriteLine($"add {match.Groups[1].ToString()} to listMembers\n");
+                    listMembers.AddLast(match.Groups[1].ToString());
+                }
+                convertToListView(listMembers);
+            }
+            //Debug.WriteLine($"listMembers count {listMembers.Count.ToString()}");
+            //foreach (string name in listMembers)
+                //Debug.WriteLine($"listMembers {name}");
+        }
+        public void checkLogoutMessage(string response)
+        {
+            string pattern = @"\A([\w]+)\ has\ left\ the\ chat\Z";
+            MatchCollection matches = Regex.Matches(response, pattern);
+            Debug.WriteLine("$matches count {matches.Count}\n");
+            if (matches.Count > 0)
+            {
+                foreach (Match match in Regex.Matches(response, pattern))
+                {
+                    //Debug.WriteLine($"add {match.Groups[1].ToString()} to listMembers\n");
+                    listMembers.Remove(match.Groups[1].ToString());
+                }
+                convertToListView(listMembers);
+            }
+            //Debug.WriteLine($"listMembers count {listMembers.Count.ToString()}");
+            //foreach (string name in listMembers)
+            //Debug.WriteLine($"listMembers {name}");
+        }
         public void convertToListView(LinkedList<string> listMembers)
         {
             lvMembers.Items.Clear();
@@ -138,6 +161,12 @@ namespace Client
             {
                 LeRemot.sendMsgToServer($"{pseudo}: {InputBox.Text}");
             }
+        }
+
+        private void Logout_Click(object sender, RoutedEventArgs e)
+        {
+            LeRemot.clientLogout(pseudo);
+            Close();
         }
     }
 }
