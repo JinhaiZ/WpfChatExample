@@ -20,7 +20,7 @@
         <TextBox x:Name="IPBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="77" Margin="315,171,0,0" Text="localhost"/>
         <TextBox x:Name="PseudoBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="77" Margin="329,115,0,0"/>
         <TextBox x:Name="PortBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="77" Margin="329,53,0,0" Text="12345"/>
-        <ListView x:Name="lvMembers" HorizontalAlignment="Left" Height="254" VerticalAlignment="Top" Width="100" Margin="411,46,0,0" ItemsSource="{Binding MembersViewList}">
+        <ListView x:Name="lvMembers" HorizontalAlignment="Left" Height="254" VerticalAlignment="Top" Width="100" Margin="411,46,0,0">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Members" Width="90" DisplayMemberBinding="{Binding MemberName}" />

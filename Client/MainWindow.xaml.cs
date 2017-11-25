@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -14,10 +13,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
-using System.Windows.Threading;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace Client
 {
@@ -28,30 +27,38 @@ namespace Client
     {
 
         private RemotingInterface.IRemotChaine LeRemot;
-        private DispatcherTimer timer;
         private LinkedList<string> listMembers;
         private int logicTime;
         private string pseudo;
 
-        public ObservableCollection<MemberViewItem> membersViewList = new ObservableCollection<MemberViewItem>();
         public MainWindow()
         {
             InitializeComponent();
             // for binding listView to the Linkedlist listMembers
             this.DataContext = this;
             listMembers = new LinkedList<string>();
+            // initialize UI component status
+            Send.IsEnabled = false;
+            Logout.IsEnabled = false;
         }
-        // for binding listView to the Linkedlist listMembers
+        // wrapper of membersViewList, the wrapper is used to binding the
+        // ListView to MembersViewList
+        /*
         public ObservableCollection<MemberViewItem> MembersViewList
         {
-            get { return membersViewList; }
-        }
+            get { return convertToListView(listMembers); }
+        }*/
 
         // add a Timer Control thread in WPF 
         void Client_Logined()
         {
             Thread th = new Thread(new ThreadStart(synchronizeFromServer));
             th.Start();
+            // change UI component status
+            Send.IsEnabled = true;
+            Logout.IsEnabled = true;
+            listMembers = LeRemot.getClientListFromServer();
+            convertToListView(listMembers);
         }
         // event handler for timer.Tick, been called every 1 second
         private void synchronizeFromServer()
@@ -59,30 +66,40 @@ namespace Client
             while (true)
             {
                 string response = LeRemot.getUpdateFromServer(logicTime);
-                Debug.WriteLine($"--tick--response {response}");
+                //Debug.WriteLine($"--tick--response {response}");
                 if (response != "")
                 {
                     App.Current.Dispatcher.Invoke((Action)delegate
                     {
                         ChatHistory.Text += $"{response}\n";
                         logicTime++;
+                        string pattern = @"\A([\w]+)\ has\ joined\ the\ chat\Z";
+                        MatchCollection matches = Regex.Matches(response, pattern);
+                        Debug.WriteLine("$matches count {matches.Count}\n");
+                        if (matches.Count > 0)
+                        {
+                            foreach (Match match in Regex.Matches(response, pattern))
+                            {
+                                Debug.WriteLine($"add {match.Groups[1].ToString()} to listMembers\n");
+                                listMembers.AddLast(match.Groups[1].ToString());
+                                
+                            }
+                            convertToListView(listMembers);
+                        }
+                        Debug.WriteLine($"listMembers count {listMembers.Count.ToString()}");
+                        foreach (string name in listMembers)
+                            Debug.WriteLine($"listMembers {name}");
                     });
                 }
-                //listMembers = LeRemot.getClientListFromServer();
-
-                //membersViewList = convertToListView(listMembers);
                 //Debug.WriteLine(listMembers);
             }
         }
 
-        ObservableCollection<MemberViewItem> convertToListView(LinkedList<string> listMembers)
+        public void convertToListView(LinkedList<string> listMembers)
         {
-            ObservableCollection<MemberViewItem> res = new ObservableCollection<MemberViewItem>();
+            lvMembers.Items.Clear();
             foreach (string name in listMembers)
-            {
-                res.Add(new MemberViewItem(name));
-            }
-            return res;
+                lvMembers.Items.Add(new MemberViewItem(name));
         }
 
         private void Login_Click(object sender, RoutedEventArgs e)
@@ -117,7 +134,7 @@ namespace Client
         private void Send_Click(object sender, RoutedEventArgs e)
         {
             Debug.WriteLine($"{pseudo}: {InputBox.Text}");
-            if (InputBox.Text.Trim() != "")
+            if (LeRemot != null && InputBox.Text.Trim() != "")
             {
                 LeRemot.sendMsgToServer($"{pseudo}: {InputBox.Text}");
             }

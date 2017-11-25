@@ -71,7 +71,7 @@ namespace remotServeur
 
         public string getUpdateFromServer(int logicTime)
         {
-            if (logicTime < historyMessage.Count)
+            if (logicTime > 0 && logicTime < historyMessage.Count)
             {
                 return historyMessage[logicTime];
             }
