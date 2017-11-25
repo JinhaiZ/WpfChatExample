@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="525"
+        Closing="Window_Closing">
     <Grid>
         <Button x:Name="Login" Content="Login" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="9,5,0,0" Click="Login_Click"/>
         <Button x:Name="Logout" Content="Logout" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="99,5,0,0" Click="Logout_Click"/>

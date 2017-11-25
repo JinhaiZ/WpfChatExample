@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Text.RegularExpressions;
+using System.ComponentModel;
 
 namespace Client
 {
@@ -160,13 +161,27 @@ namespace Client
             if (LeRemot != null && InputBox.Text.Trim() != "")
             {
                 LeRemot.sendMsgToServer($"{pseudo}: {InputBox.Text}");
+                // re-initialize the send text box to vide
+                InputBox.Text = "";
             }
         }
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
-            LeRemot.clientLogout(pseudo);
             Close();
+        }
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("Do you really want quit?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                if (LeRemot != null)
+                    LeRemot.clientLogout(pseudo);
+            }
+            else
+            {
+                e.Cancel = true;
+            }
         }
     }
 }
