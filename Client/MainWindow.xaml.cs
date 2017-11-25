@@ -17,6 +17,7 @@ using System.Runtime.Remoting.Channels.Tcp;
 using System.Windows.Threading;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace Client
 {
@@ -49,30 +50,39 @@ namespace Client
         // add a Timer Control thread in WPF 
         void Client_Logined()
         {
-            //timer.Elapsed += timer1_Tick
-            //timer.AutoReset = false;
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(1);
-            timer.Tick += timer1_Tick;
-
-            timer.Start();
+            Thread th = new Thread(new ThreadStart(synchronizeFromServer));
+            th.Start();
         }
         // event handler for timer.Tick, been called every 1 second
-        private void timer1_Tick(object sender, EventArgs e)
+        private void synchronizeFromServer()
         {
-            
-            string response = LeRemot.getUpdateFromServer(logicTime);
-            Debug.WriteLine($"--tick--response {response}");
-            Debug.WriteLine(response);
-            if (response != "")
+            while (true)
             {
-                ChatHistory.Text += $"{response}\n";
-                logicTime++;
+                string response = LeRemot.getUpdateFromServer(logicTime);
+                Debug.WriteLine($"--tick--response {response}");
+                if (response != "")
+                {
+                    App.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        ChatHistory.Text += $"{response}\n";
+                        logicTime++;
+                    });
+                }
+                //listMembers = LeRemot.getClientListFromServer();
+
+                //membersViewList = convertToListView(listMembers);
+                //Debug.WriteLine(listMembers);
             }
-            listMembers = LeRemot.getClientListFromServer();
-            Debug.WriteLine(listMembers.Count);
-            //timer.Stop();
-            //this.Close();
+        }
+
+        ObservableCollection<MemberViewItem> convertToListView(LinkedList<string> listMembers)
+        {
+            ObservableCollection<MemberViewItem> res = new ObservableCollection<MemberViewItem>();
+            foreach (string name in listMembers)
+            {
+                res.Add(new MemberViewItem(name));
+            }
+            return res;
         }
 
         private void Login_Click(object sender, RoutedEventArgs e)
