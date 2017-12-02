@@ -13,44 +13,44 @@ namespace Client
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        // déclarer le RemotingInterface
         private RemotingInterface.IRemotChaine LeRemot;
+        // déclarer une liste pour enregister les membres
         private LinkedList<string> listMembers;
+        // déclarer une varible pour determiner quels messages devraient demander depuis le serveur
         private int logicTime;
+        // le pseudonyme d'utilisateur
         private string pseudo;
-
+        // le thread qui s'occupe la communication entre le client et le serveur
+        Thread th;
+        // fonction qui va être appelé lorsque l'utilisateur clique login
         public MainWindow()
         {
             InitializeComponent();
-            // for binding listView to the Linkedlist listMembers
+            // pour la data binding entre la listView et le Linkedlist de listMembers
             this.DataContext = this;
             listMembers = new LinkedList<string>();
-            // initialize UI component status
+            // initialiser l'état des composants UI
             Send.IsEnabled = false;
             Logout.IsEnabled = false;
+            ChatHistory.IsReadOnly = true;
         }
-        // wrapper of membersViewList, the wrapper is used to binding the
-        // ListView to MembersViewList
-        /*
-        public ObservableCollection<MemberViewItem> MembersViewList
-        {
-            get { return convertToListView(listMembers); }
-        }*/
-
-        // add a Timer Control thread in WPF 
+        // fonction qui va être appelé lorsque l'utilisateur login avec succès
+        // créer un thread qui s'occupe la communication entre le client et le serveur
         void Client_Logined()
         {
-            Thread th = new Thread(new ThreadStart(synchronizeFromServer));
+            th = new Thread(new ThreadStart(synchronizeFromServer));
             th.Start();
-
+            // récuperer la liste de membres en ligne
             listMembers = LeRemot.getClientListFromServer();
+            // mise à jour le listView egalement
             convertToListView(listMembers);
-            // change UI component status
+            // mise à jour l'état des composants UI
             Send.IsEnabled = true;
             Logout.IsEnabled = true;
             Login.IsEnabled = false;
         }
-        // continously send request to the server in order to be updated
+        // envoyer en continu la requête au serveur pour être mis à jour
         private void synchronizeFromServer()
         {
             while (true)
@@ -59,10 +59,12 @@ namespace Client
                 //Debug.WriteLine($"--tick--response {response}");
                 if (response != "")
                 {
+                    // pour que ce thread pussie modifier les états du thread pricipal
                     App.Current.Dispatcher.Invoke((Action)delegate
                     {
                         ChatHistory.Text += $"{response}\n";
                         logicTime++;
+                        // vérifier les messages spéciaux, message de login ou message de logout
                         checkLoginMessage(response);
                         checkLogoutMessage(response);
                     });
@@ -70,8 +72,10 @@ namespace Client
                 //Debug.WriteLine(listMembers);
             }
         }
+        // si un message reçu est de type login, ajouter ce membre à la liste des membres
         public void checkLoginMessage(string response)
         {
+            // identifier ce qui a login en utilisant les expressions régulières
             string pattern = @"\A([\w]+)\ has\ joined\ the\ chat\Z";
             MatchCollection matches = Regex.Matches(response, pattern);
             Debug.WriteLine("$matches count {matches.Count}\n");
@@ -88,6 +92,7 @@ namespace Client
             //foreach (string name in listMembers)
                 //Debug.WriteLine($"listMembers {name}");
         }
+        // si un message reçu est de type logout, supprimer ce membre de la liste des membres
         public void checkLogoutMessage(string response)
         {
             string pattern = @"\A([\w]+)\ has\ left\ the\ chat\Z";
@@ -106,16 +111,17 @@ namespace Client
             //foreach (string name in listMembers)
             //Debug.WriteLine($"listMembers {name}");
         }
+        // mise à jour la listView de membres en ligne
         public void convertToListView(LinkedList<string> listMembers)
         {
             lvMembers.Items.Clear();
             foreach (string name in listMembers)
                 lvMembers.Items.Add(new MemberViewItem(name));
         }
-
+        // fonction qui va être appelé lorsque l'utilisateur clique le bouton login
         private void Login_Click(object sender, RoutedEventArgs e)
         {
-            // use regular expression to check the validity of port number
+            // utiliser l'expression régulière pour vérifier la validité du numéro de port
             Regex rgxPort = new Regex(@"^[\d]+$");
             if (!rgxPort.IsMatch(PortBox.Text))
             {
@@ -124,7 +130,7 @@ namespace Client
             }
             int port = Int32.Parse(PortBox.Text);
             pseudo = PseudoBox.Text;
-            // use regular expression to check the validity of pseudo name
+            // utiliser une expression régulière pour vérifier la validité du pseudonyme
             Regex rgxPseudo = new Regex(@"^[a-zA-Z][\w]*$");
             if (!rgxPseudo.IsMatch(pseudo))
             {
@@ -132,26 +138,28 @@ namespace Client
                 return;
             }
             string ip = IPBox.Text;
-            //Default address "tcp://localhost:12345/Serveur"
+            // Adresse par défaut "tcp://localhost:12345/Serveur"
             LeRemot = (RemotingInterface.IRemotChaine)Activator.GetObject(
-            typeof(RemotingInterface.IRemotChaine), $"tcp://{ip}:{port}/Serveur");
+                typeof(RemotingInterface.IRemotChaine), $"tcp://{ip}:{port}/Serveur");
 
-            // catch connection error
+            // attraper une erreur de connexion
             try
             {
+                // récuperer le horlge logique dépuis le serveur, s'il y une erreur de connexion,
+                // une erreur de type System.Net.Sockets.SocketException va se poser 
                 logicTime = LeRemot.clientLogin(pseudo);
             }
-            // when connection error occurs, ask the user to re-connect
+            // lorsque l'erreur de connexion se produit, demandez à l'utilisateur de se reconnecter
             catch (System.Net.Sockets.SocketException err) 
             {
-                MessageBox.Show("Error connecting the remote server, please choose another address", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Error connecting the remote server, please choose another combination of port and address", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Console.WriteLine("{0} Exception caught.", err);
                 return;
             }
-            // handle username duplication error
+            // gérer l'erreur de duplication du nom d'utilisateur
             if (logicTime == -1)
             {
-                //Debug.WriteLine("logicTime {0}", logicTime);
+                // Debug.WriteLine("logicTime {0}", logicTime);
                 MessageBox.Show("The current pseudo is not available, please choose another Pesedo", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
@@ -160,11 +168,11 @@ namespace Client
                 PortBox.IsEnabled = false;
                 PseudoBox.IsEnabled = false;
                 IPBox.IsEnabled = false;
-                // start a thread to get updates from server
+                // démarrer le thread pour obtenir des mises à jour du serveur
                 Client_Logined();
             }
         }
-
+        // la classe qui définit l'élément dans la listView de membres en ligne
         public class MemberViewItem
         {
             public MemberViewItem(string MemberName)
@@ -173,7 +181,7 @@ namespace Client
             }
             public string MemberName { get; set; }
         }
-
+        // fonction qui va être appelé lorsque l'utilisateur clique le bouton send
         private void Send_Click(object sender, RoutedEventArgs e)
         {
             Debug.WriteLine($"{pseudo}: {InputBox.Text}");
@@ -184,11 +192,29 @@ namespace Client
                 InputBox.Text = "";
             }
         }
-
+        // fonction qui va être appelé lorsque l'utilisateur clique le bouton logout
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            // arrêter le thread
+            th.Abort();
+            // envoyer un message de type logout au serveur
+            LeRemot.clientLogout(pseudo);
+            // annuler la connections entre le client et le serveur
+            LeRemot = null;
+            // re-initialiser la liste listMembers
+            listMembers = new LinkedList<string>();
+            // mise à jour la listView également
+            convertToListView(listMembers);
+            // initialize UI component status
+            Send.IsEnabled = false;
+            Logout.IsEnabled = false;
+            Login.IsEnabled = true;
+            PortBox.IsEnabled = true;
+            PseudoBox.IsEnabled = true;
+            IPBox.IsEnabled = true;
+            ChatHistory.Text = "";
         }
+        // fonction qui va être appelé lorsque l'utilisateur clique le croix rouge
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             MessageBoxResult result = MessageBox.Show("Do you really want quit?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
