@@ -53,7 +53,7 @@ namespace Client
         // envoyer en continu la requête au serveur pour être mis à jour
         private void synchronizeFromServer()
         {
-            while (true)
+            while (true && LeRemot != null)
             {
                 string response = LeRemot.getUpdateFromServer(logicTime);
                 //Debug.WriteLine($"--tick--response {response}");
