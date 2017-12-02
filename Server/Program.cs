@@ -41,37 +41,40 @@ namespace remotServeur
 
 
         #region Membres de IRemotChaine
-
+        // envoyer un message au serveur
         public void sendMsgToServer(string msg)
         {
             Console.WriteLine($"{msg}");
             historyMessage.Add(msg);
         }
-
+        // fonction qui va être appelé lorsque l'utilisatuer login
         public int clientLogin(string pseudo)
         {
+            // s'il y a une duplication de nom d'utilisateur, renvoyé -1
             if (listMembers.Contains(pseudo))
                 return -1;
             listMembers.AddLast(pseudo);
             sendMsgToServer($"{pseudo} has joined the chat");
+            // la valeur renvoyée est l'horloge logique pour le client
             return historyMessage.Count;
         }
-
+        // fonction qui va être appelé lorsque l'utilisatuer logout
         public void clientLogout(string pseudo)
         {
             listMembers.Remove(pseudo);
             sendMsgToServer($"{pseudo} has left the chat");
         }
-
+        // fonction qui va être appelé lorsque l'utilisatuer demande mise à jour
         public string getUpdateFromServer(int logicTime)
         {
+            // renvoyer un message selon l'horloge logique du client
             if (logicTime > 0 && logicTime < historyMessage.Count)
             {
                 return historyMessage[logicTime];
             }
             return "";
         }
-
+        // fonction qui va être appelé lorsque l'utilisatuer vient de connecter au servuer
         public LinkedList<string> getClientListFromServer()
         {
             return listMembers;
