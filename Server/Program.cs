@@ -42,12 +42,6 @@ namespace remotServeur
 
         #region Membres de IRemotChaine
 
-        public string Hello()
-        {
-            // TODO : ajoutez l'implémentation de Serveur.Hello
-            return "la chaine se trouvant sur le serveur";
-        }
-
         public void sendMsgToServer(string msg)
         {
             Console.WriteLine($"{msg}");

@@ -9,7 +9,6 @@ namespace RemotingInterface
     /// </summary>
     public interface IRemotChaine
     {
-        string Hello();
         void sendMsgToServer(string msg);
         int clientLogin(string pseudo);
         void clientLogout(string pseudo);
