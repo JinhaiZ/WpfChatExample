@@ -1,20 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Channels.Tcp;
 using System.Diagnostics;
-using System.Collections.ObjectModel;
 using System.Threading;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
@@ -63,7 +50,7 @@ namespace Client
             Logout.IsEnabled = true;
             Login.IsEnabled = false;
         }
-        // event handler for timer.Tick, been called every 1 second
+        // continously send request to the server in order to be updated
         private void synchronizeFromServer()
         {
             while (true)
@@ -128,22 +115,54 @@ namespace Client
 
         private void Login_Click(object sender, RoutedEventArgs e)
         {
+            // use regular expression to check the validity of port number
+            Regex rgxPort = new Regex(@"^[\d]+$");
+            if (!rgxPort.IsMatch(PortBox.Text))
+            {
+                MessageBox.Show("Port number not validate, it should be a digit or digits", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             int port = Int32.Parse(PortBox.Text);
             pseudo = PseudoBox.Text;
+            // use regular expression to check the validity of pseudo name
+            Regex rgxPseudo = new Regex(@"^[a-zA-Z][\w]*$");
+            if (!rgxPseudo.IsMatch(pseudo))
+            {
+                MessageBox.Show("Pseudo name not validate, it should longer thant one and begin with a alphabet", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             string ip = IPBox.Text;
-            PortBox.IsEnabled = false;
-            PseudoBox.IsEnabled = false;
-            IPBox.IsEnabled = false;
             //Default address "tcp://localhost:12345/Serveur"
             LeRemot = (RemotingInterface.IRemotChaine)Activator.GetObject(
-                typeof(RemotingInterface.IRemotChaine), $"tcp://{ip}:{port}/Serveur");
-            if (LeRemot != null)
+            typeof(RemotingInterface.IRemotChaine), $"tcp://{ip}:{port}/Serveur");
+
+            // catch connection error
+            try
             {
-                // start a thread to get updates from server
                 logicTime = LeRemot.clientLogin(pseudo);
+            }
+            // when connection error occurs, ask the user to re-connect
+            catch (System.Net.Sockets.SocketException err) 
+            {
+                MessageBox.Show("Error connecting the remote server, please choose another address", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Console.WriteLine("{0} Exception caught.", err);
+                return;
+            }
+            // handle username duplication error
+            if (logicTime == -1)
+            {
+                //Debug.WriteLine("logicTime {0}", logicTime);
+                MessageBox.Show("The current pseudo is not available, please choose another Pesedo", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            else
+            {
+                PortBox.IsEnabled = false;
+                PseudoBox.IsEnabled = false;
+                IPBox.IsEnabled = false;
+                // start a thread to get updates from server
                 Client_Logined();
             }
-            //TODO: manage error input
         }
 
         public class MemberViewItem
@@ -176,7 +195,10 @@ namespace Client
             if (result == MessageBoxResult.Yes)
             {
                 if (LeRemot != null)
+                {
                     LeRemot.clientLogout(pseudo);
+                    LeRemot = null;
+                }
             }
             else
             {
